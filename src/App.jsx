@@ -1,22 +1,21 @@
-import { useState } from "react"
-
-const Card = ({ title }) => {
-  const [hasLiked, setHasLiked] = useState(false);
-
-  return (<div className="border border-zinc-500 py-3 px-4 rounded-md bg-zinc-700">
-    <h2 className="text-xl font-bold ">{title}</h2>
-    <button onClick={() => setHasLiked(true)}>Like</button> 
-  </div>)
-}
-
+import React from 'react'
+import Search from './components/search'
 
 const App = () => {
   return (
-    <div className="flex justify-center items-center flex-col gap-[10px] py-10">
-      <Card title="Star Wars"/>
-      <Card title="Avatar"/>
-      <Card title="The Lion Car"/>
-    </div>
+    <main>
+      <div className='pattern' />
+
+      <div className='wrapper'>
+        <header>
+          <img src="./hero.png" alt="Hero Banner" />
+          <h1>Find <span className='text-gradient'>Movies</span> You'll Enjoy Without the Hassle</h1>
+        </header>
+
+        <Search />
+      </div>
+
+    </main>
   )
 }
 
