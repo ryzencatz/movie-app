@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import Search from './components/Search'
 import MovieCard from './components/MovieCard';
+import { useDebounce } from 'react-use';
+import { updateSearchCount } from './appwrite';
 
+// API consts
 const API_BASE_URL = 'https://api.themoviedb.org/3';
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const API_OPTIONS = {
@@ -13,11 +16,17 @@ const API_OPTIONS = {
 };
 
 const App = () => {
+  // states
   const [searchTerm, setSearchTerm] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
 
+  // debounce search term to avoid making too many API requests
+  useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm]);
+
+  // gets the movies and stores them in movieList
   const fetchMovies = async (query = '') => {
     setIsLoading(true);
     setErrorMessage('');
@@ -41,6 +50,8 @@ const App = () => {
       }
 
       setMovieList(data.results || []);
+
+      updateSearchCount();
     } catch (error) {
       console.log(`Error fetching movies: ${error}`);
       setErrorMessage('Error fetching movies. Please try again later.');
@@ -49,11 +60,11 @@ const App = () => {
     }
   }
 
-
+  // call fetchMovies when searchTerm changes
   useEffect(() => {
-    fetchMovies(searchTerm);
-  }, [searchTerm]);
-  
+    fetchMovies(debouncedSearchTerm);
+  }, [debouncedSearchTerm])
+  // log movieList in console when movieList changes
   useEffect(() => {
     console.log(movieList);
   }, [movieList]);
@@ -73,15 +84,18 @@ const App = () => {
         <section className='all-movies'>
           <h2 className='mt-10'>All Movies</h2>
           
-          {isLoading ? (
+          {isLoading ? 
             <p className='text-center'>Loading ...</p>
-          ) : errorMessage ? (
+           : errorMessage ?
             <p className='text-red-500'>{errorMessage}</p>
-          ) : <ul>
+           : movieList.length > 0 ?
+            <ul>
               {movieList.map((movie) => (
                 <MovieCard key={movie.id} movie={movie} />
               ))}
-            </ul>}
+            </ul>
+            : <p className='text-center'>No movies found.</p> 
+          }
         </section>
       </div>
 
