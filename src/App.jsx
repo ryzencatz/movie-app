@@ -26,7 +26,7 @@ const App = () => {
   // debounce search term to avoid making too many API requests
   useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm]);
 
-  // gets the movies and stores them in movieList
+  // shows movies related to what user searches; if none, then shows trending movies
   const fetchMovies = async (query = '') => {
     setIsLoading(true);
     setErrorMessage('');
