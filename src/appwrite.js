@@ -1,4 +1,4 @@
-import { Client, Query, TablesDB } from "appwrite";
+import { Client, ID, Query, TablesDB } from "appwrite";
 
 // collections -> table
 // documents -> rows
@@ -14,11 +14,14 @@ const client = new Client()
 
 const tablesDB = new TablesDB(client);
 
-export const updateSearchCount = async (searchTerm, movie) => {
-    // 1. use Appwrite SDK to check if the search term exists in the db
-
+export const updateSearchCount = async (searchTerm) => {    
+    if (searchTerm) {
+        console.log(`search term: ${searchTerm}`); // log searchTerm
+    } 
+    
     try {
-        const result = await tablesDB.listRows({
+        // 1. use Appwrite SDK to check if the search term exists in the db
+        const rowsMatchingSearchTerm = await tablesDB.listRows({
             databaseId: DATABASE_ID,
             tableId: TABLE_ID,
             queries: [
@@ -26,7 +29,25 @@ export const updateSearchCount = async (searchTerm, movie) => {
             ]
         });
 
-        console.log(result);
+        console.log(`rowsMatchingSearchTerm:`); // log whatever server sends back
+        console.log(rowsMatchingSearchTerm);
+
+        // if search term is not in db, create a new row with the search term and count as 1
+        if (rowsMatchingSearchTerm.total === 0) {
+            console.log(`${searchTerm} does not exist in db. Adding...`);
+            
+            const newRow = await tablesDB.createRow({
+                databaseId: DATABASE_ID,
+                tableId: TABLE_ID,
+                rowId: ID.unique(),
+                data: {
+                    searchTerm: searchTerm,
+                    count: 1
+                }
+            });
+            console.log("created row:", newRow);
+        }
+
     } catch (error) {
         console.error(error);
     }
