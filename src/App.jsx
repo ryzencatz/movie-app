@@ -22,9 +22,10 @@ const App = () => {
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
   // debounce search term to avoid making too many API requests
-  useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm]);
+  useDebounce(() => setDebouncedSearchTerm(searchTerm), 750, [searchTerm]);
 
   // shows movies related to what user searches; if none, then shows trending movies
   const fetchMovies = async (query = '') => {
@@ -51,8 +52,8 @@ const App = () => {
 
       setMovieList(data.results || []);
 
-      if (query && data.results?.length > 0) {
-        updateSearchCount(query, data.results[0]);
+      if (query && data.results.length > 0) {
+        await updateSearchCount(query, data.results[0]);
       }
     } catch (error) {
       console.log(`Error fetching movies: ${error}`);

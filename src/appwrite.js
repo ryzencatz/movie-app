@@ -73,3 +73,16 @@ export const updateSearchCount = async (searchTerm, movie) => {
     // 2. if it does, update the count
     // 3. if it doesn't, create a new row with the search term and count as 1
 }
+
+export const getTrendingMovies = async () => {
+    try {
+        const result = await tablesDB.listRows(DATABASE_ID, TABLE_ID, [
+            Query.limit(5),
+            Query.orderDesc("count")
+        ])
+
+        return result.rows;
+    } catch (error) {
+        console.error(error)
+    }
+}
